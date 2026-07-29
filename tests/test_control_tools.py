@@ -376,6 +376,95 @@ class ViomiAirConditionProfileTests(unittest.TestCase):
         self.assertEqual(capabilities["actions"], [])
 
 
+class YeelinkLamp2ProfileTests(unittest.TestCase):
+    def setUp(self):
+        self.plugin = _Plugin(
+            model="yeelink.light.lamp2",
+            category=profiles.CATEGORY_LIGHT,
+        )
+        self.service = control_module.MiHomeControlTools(self.plugin)
+        self.device, error = self.service._resolve_allowed_device("客厅空调")
+        self.assertIsNone(error)
+        self.assertIsNotNone(self.device)
+
+    def test_profile_exposes_only_spec_backed_direct_controls(self):
+        capabilities = self.service._aggregate_capabilities(self.device)
+        writable = {
+            item["key"] for item in capabilities["writable_properties"]
+        }
+        readable = {
+            item["key"] for item in capabilities["readable_properties"]
+        }
+        actions = {item["key"] for item in capabilities["actions"]}
+
+        self.assertTrue(capabilities["direct_control_supported"])
+        self.assertEqual(
+            writable,
+            {"on", "brightness", "color-temperature", "mode"},
+        )
+        self.assertEqual(
+            readable,
+            {"on", "brightness", "color_temperature"},
+        )
+        self.assertEqual(actions, {"toggle"})
+        self.assertNotIn("anti_flicker", readable | writable)
+        self.assertNotIn("temperature", readable | writable)
+        self.assertNotIn("brightness_delta", writable)
+        self.assertNotIn("ct_delta", writable)
+        self.assertNotIn("ct_adjust_alexa", writable)
+
+    def test_color_temperature_uses_runtime_spec_key_for_writes(self):
+        client = object.__new__(client_module.MiHomeClient)
+        prop = types.SimpleNamespace(
+            rw="rw",
+            type="uint",
+            range=[2500, 4800, 1],
+            value_list=None,
+            method={"siid": 2, "piid": 3},
+        )
+        runtime_device = types.SimpleNamespace(
+            prop_list={"color-temperature": prop}
+        )
+
+        method = client._build_property_method(
+            runtime_device,
+            "did",
+            profiles.get_device_prop_map(
+                model="yeelink.light.lamp2",
+                category=profiles.CATEGORY_LIGHT,
+            )["色温"],
+            4000,
+        )
+
+        self.assertEqual(
+            method,
+            {"siid": 2, "piid": 3, "did": "did", "value": 4000},
+        )
+
+    def test_profile_scopes_mode_values_to_the_exact_model(self):
+        reading = self.service._translate_property(
+            self.device,
+            "模式",
+            "阅读模式",
+        )
+        work = self.service._translate_property(
+            self.device,
+            "模式",
+            "工作模式",
+        )
+        unsupported = self.service._translate_property(
+            self.device,
+            "模式",
+            "自动",
+        )
+
+        self.assertTrue(reading["ok"])
+        self.assertEqual(reading["value"], 0)
+        self.assertTrue(work["ok"])
+        self.assertEqual(work["value"], 4)
+        self.assertFalse(unsupported["ok"])
+
+
 class ActionTests(unittest.IsolatedAsyncioTestCase):
     async def test_parameterized_action_is_scoped_and_output_hides_text(self):
         plugin = _Plugin(

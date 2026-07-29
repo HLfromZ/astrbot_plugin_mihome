@@ -16,6 +16,7 @@ CATEGORY_VACUUM = "扫地机类别"
 CATEGORY_WATER_HEATER = "热水器类别"
 CATEGORY_ROUTER = "路由器类别"
 CATEGORY_SPEAKER = "音箱类别"
+CATEGORY_LIGHT = "灯类别"
 CATEGORY_SWITCH = "开关类别"
 CATEGORY_DOOR_SENSOR = "门磁传感器类别"
 CATEGORY_GAS_SENSOR = "燃气传感器类别"
@@ -33,6 +34,7 @@ VALID_CATEGORIES = {
     CATEGORY_WATER_HEATER,
     CATEGORY_ROUTER,
     CATEGORY_SPEAKER,
+    CATEGORY_LIGHT,
     CATEGORY_SWITCH,
     CATEGORY_DOOR_SENSOR,
     CATEGORY_GAS_SENSOR,
@@ -761,6 +763,46 @@ CATEGORY_PROFILES = {
         "action_examples": ["播放", "暂停", "下一首"],
         "help_hints": {
             "音量": "范围 5~100 的整数",
+        },
+    },
+
+    CATEGORY_LIGHT: {
+        "prop_map": {
+            "开关": "on",
+            "亮度": "brightness",
+            "色温": "color-temperature",
+        },
+        "value_map": {
+            "开": True,
+            "关": False,
+        },
+        "display_map": {
+            "on": "电源状态",
+            "brightness": "亮度",
+            "color_temperature": "色温",
+        },
+        "detail_writable": [
+            "on",
+            "brightness",
+            "color-temperature",
+        ],
+        "detail_readable": [
+            "on",
+            "brightness",
+            "color_temperature",
+        ],
+        "detail_actions": ["toggle"],
+        "action_map": {
+            "切换": "toggle",
+        },
+        "help_examples": {
+            "亮度": ["20", "50", "100"],
+            "色温": ["3000", "4000"],
+        },
+        "action_examples": ["切换"],
+        "help_hints": {
+            "亮度": "通常为 1~100 的整数，具体范围以设备规格为准",
+            "色温": "单位为 K，具体范围以设备规格为准",
         },
     },
 
@@ -2052,6 +2094,72 @@ MODEL_PROFILES: Dict[str, Dict[str, Any]] = {
             "重启",
         ],
         "help_hints": {},
+    },
+
+    # 米家台灯 Pro，规格：
+    # urn:miot-spec-v2:device:light:0000A001:yeelink-lamp2:2
+    "yeelink.light.lamp2": {
+        "category": CATEGORY_LIGHT,
+        "hidden_props": [
+            "brightness_delta",
+            "ct_delta",
+            "ct_adjust_alexa",
+        ],
+        "prop_map": {
+            "开关": "on",
+            "亮度": "brightness",
+            "色温": "color-temperature",
+            "模式": "mode",
+        },
+        "value_map": {
+            "开": True,
+            "关": False,
+        },
+        "property_value_map": {
+            "mode": {
+                "阅读": 0,
+                "阅读模式": 0,
+                "电脑": 1,
+                "电脑模式": 1,
+                "夜灯": 2,
+                "防蓝光": 3,
+                "防蓝光模式": 3,
+                "工作": 4,
+                "工作模式": 4,
+            },
+        },
+        "display_map": {
+            "on": "电源状态",
+            "brightness": "亮度",
+            "color_temperature": "色温",
+            "mode": "模式",
+        },
+        "detail_writable": [
+            "on",
+            "brightness",
+            "color-temperature",
+            "mode",
+        ],
+        "detail_readable": [
+            "on",
+            "brightness",
+            "color_temperature",
+        ],
+        "detail_actions": ["toggle"],
+        "action_map": {
+            "切换": "toggle",
+        },
+        "help_examples": {
+            "亮度": ["20", "50", "100"],
+            "色温": ["2500", "4000", "4800"],
+            "模式": ["阅读模式", "电脑模式", "夜灯", "防蓝光", "工作模式"],
+        },
+        "action_examples": ["切换"],
+        "help_hints": {
+            "亮度": "支持 1~100，步进 1",
+            "色温": "支持 2500~4800 K，步进 1",
+            "模式": "支持阅读、电脑、夜灯、防蓝光和工作模式",
+        },
     },
 
     # 感谢 @Siq5005 在 PR #13 中提供小米智能音箱 OH2P 的实机能力数据。

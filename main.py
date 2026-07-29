@@ -31,6 +31,7 @@ from .device_profiles import (
     CATEGORY_WATER_HEATER,
     CATEGORY_ROUTER,
     CATEGORY_SPEAKER,
+    CATEGORY_LIGHT,
     CATEGORY_SWITCH,
     CATEGORY_DOOR_SENSOR,
     CATEGORY_GAS_SENSOR,
@@ -99,13 +100,14 @@ READONLY_ALLOWED_CATEGORIES = {
     CATEGORY_WATER_HEATER,
     CATEGORY_ROUTER,
     CATEGORY_SPEAKER,
+    CATEGORY_LIGHT,
     CATEGORY_SWITCH,
     CATEGORY_DOOR_SENSOR,
     CATEGORY_GAS_SENSOR,
 }
 
 
-@register(PLUGIN_NAME, "Ryan", "米家云端智能管家", "8.1.1")
+@register(PLUGIN_NAME, "Ryan", "米家云端智能管家", "8.1.2-hlfromz.1")
 class MiHomeControlPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig = None):
         super().__init__(context)

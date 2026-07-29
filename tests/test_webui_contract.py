@@ -200,6 +200,10 @@ class WebAPIBehaviorTests(unittest.TestCase):
     def tool_revision(self, api):
         return api._config_revision(self.web._TOOL_REVISION_KEYS)
 
+    def test_light_category_is_available_to_webui_and_validation(self):
+        self.assertIn(self.web.CATEGORY_LIGHT, self.web.CATEGORY_OPTIONS)
+        self.assertIn(self.web.CATEGORY_LIGHT, self.web.VALID_CATEGORIES)
+
     def test_route_surface_is_management_only(self):
         api, _plugin = self.build_api()
         registered = []
@@ -974,6 +978,10 @@ class WebAPIBehaviorTests(unittest.TestCase):
 
 
 class WebUIStaticContractTests(unittest.TestCase):
+    def test_light_category_is_present_in_frontend_fallback(self):
+        script = (PAGE_DIR / "app.js").read_text(encoding="utf-8")
+        self.assertIn('"灯类别"', script)
+
     def test_page_uses_bridge_without_direct_dashboard_access(self):
         html = (PAGE_DIR / "index.html").read_text(encoding="utf-8")
         script = (PAGE_DIR / "app.js").read_text(encoding="utf-8")
